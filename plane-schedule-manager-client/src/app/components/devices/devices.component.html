@@ -1,0 +1,15 @@
+<span class="font-sans font-bold text-lg">Devices</span>
+<table class="table-fixed">
+  <tr>
+    <th class="w-1/3">DeviceId</th>
+    <th class="w-1/3">Timestamp</th>
+    <th class="w-1/3">Status</th>
+  </tr>
+  <ng-container *ngFor="let heartbeat of heartbeats">
+    <tr>
+      <td class="w-1/3 text-center">{{heartbeat.deviceId}}</td>
+      <td class="w-1/3 text-center">{{heartbeat.timeStamp}}</td>
+      <td class="w-1/3 text-center">{{heartbeat.status | deviceStatus}}</td>
+    </tr>
+  </ng-container>
+</table>
