@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32002.185
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlaneScheduleManager.Server", "PlaneScheduleManager.Server\PlaneScheduleManager.Server.csproj", "{B95BEA73-E1B5-4BBB-BF0C-F7D8284C67F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoTDevice.Client", "IoTDevice.Client\IoTDevice.Client.csproj", "{38EF6274-937D-4F7B-BFCC-1135728D0210}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlaneScheduleManager.Server.Tests", "PlaneScheduleManager.Server.Tests\PlaneScheduleManager.Server.Tests.csproj", "{E3B3DDFC-3022-40B1-8539-AFD87CF3A72D}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "plane-schedule-manager-client", "plane-schedule-manager-client\plane-schedule-manager-client.esproj", "{61A80D81-1C5A-4684-B445-7F0DE162FA5F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B95BEA73-E1B5-4BBB-BF0C-F7D8284C67F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B95BEA73-E1B5-4BBB-BF0C-F7D8284C67F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B95BEA73-E1B5-4BBB-BF0C-F7D8284C67F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B95BEA73-E1B5-4BBB-BF0C-F7D8284C67F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38EF6274-937D-4F7B-BFCC-1135728D0210}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38EF6274-937D-4F7B-BFCC-1135728D0210}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38EF6274-937D-4F7B-BFCC-1135728D0210}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38EF6274-937D-4F7B-BFCC-1135728D0210}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3B3DDFC-3022-40B1-8539-AFD87CF3A72D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3B3DDFC-3022-40B1-8539-AFD87CF3A72D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3B3DDFC-3022-40B1-8539-AFD87CF3A72D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3B3DDFC-3022-40B1-8539-AFD87CF3A72D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61A80D81-1C5A-4684-B445-7F0DE162FA5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61A80D81-1C5A-4684-B445-7F0DE162FA5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61A80D81-1C5A-4684-B445-7F0DE162FA5F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{61A80D81-1C5A-4684-B445-7F0DE162FA5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61A80D81-1C5A-4684-B445-7F0DE162FA5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61A80D81-1C5A-4684-B445-7F0DE162FA5F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {226133A0-7983-441A-B15C-2D54E79240E5}
+	EndGlobalSection
+EndGlobal
