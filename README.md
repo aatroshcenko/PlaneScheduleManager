@@ -1,5 +1,5 @@
 # basic-signalR-setup
-![](https://d16rtcb5cr0vb4.cloudfront.net/C0335+Building+IoT+Applications+with+SignalR%2FResources%2FImages%2F2021-02-17_Building-IoT-Applications-with-SignalR+1_V1.png?Expires=1659040056&Signature=gXXvqRUHg9uwogf2N0v-NBqgboRrnoJFRZ5pd8Pho~WPTWwmdkPheCfCrisBVL1lidGwEef-dk55H~HqljP3ohdp8b1YKeGfpV6P0NYSOKU8Sm2RCAYuSW0m-OMBrrNd9ttaToGBIJYHQaUwsNuVEw~aXGeNtUc1wY395gs7NGYMbSHEYmUqzaMEpBsTr-c8mRgzS-gJ4GX74aJgNmjNwybzqmaZ~GiWyuPwCrXOv~WF15Mmw4M~NWJI95DW8FoDnnDBtG4bWtilVHtDZxbxpxW9~6Dudx8N5PnM39GYlXYAjQNEOtqT256Y35RM8DNLD1ss2ZCIEJbckcxDcYP0Ww__&Key-Pair-Id=APKAIHLKH2FX732Z3HGA)
+![Uploading C0335+Building+IoT+Applications+with+SignalR_Resources_Images_2021-02-17_Building-IoT-Applications-with-SignalR+1_V1.png…]()
 
 In the diagram:
 * SignalR Hub Server represents a web application that hosts server-side components of SignalR
