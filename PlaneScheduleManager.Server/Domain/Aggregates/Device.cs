@@ -1,9 +1,10 @@
-﻿using PlaneScheduleManager.Server.Clients.Interfaces;
+﻿using PlaneScheduleManager.Server.Domain.Aggregates.Interfaces;
 
-namespace PlaneScheduleManager.Server.Clients
+namespace PlaneScheduleManager.Server.Domain.Aggregates
 {
     public class Device : IClient
     {
+        public static readonly string GroupName = "Devices";
         public string Identifier { get; }
 
         public bool IsManager()

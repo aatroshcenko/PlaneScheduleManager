@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 using PlaneScheduleManager.Server.Models;
-using PlaneScheduleManager.Server.Clients.Interfaces;
-using PlaneScheduleManager.Server.Clients;
+using PlaneScheduleManager.Server.Domain.Aggregates.Interfaces;
+using PlaneScheduleManager.Server.Domain.Aggregates;
 using PlaneScheduleManager.Server.Utils.Interfaces;
 
 namespace PlaneScheduleManager.Server.Hubs
@@ -59,6 +59,7 @@ namespace PlaneScheduleManager.Server.Hubs
             }
             else
             {
+                await Groups.AddToGroupAsync(Context.ConnectionId, Device.GroupName);
                 await Clients.Groups(Manager.GroupName)
                     .SendAsync("ReceiveDeviceHeartbeat", new DeviceHeartbeat()
                     {

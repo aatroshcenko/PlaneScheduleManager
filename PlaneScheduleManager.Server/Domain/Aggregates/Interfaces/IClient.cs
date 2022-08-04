@@ -1,4 +1,4 @@
-﻿namespace PlaneScheduleManager.Server.Clients.Interfaces
+﻿namespace PlaneScheduleManager.Server.Domain.Aggregates.Interfaces
 {
     public interface IClient
     {
