@@ -1,4 +1,4 @@
-# basic-signalR-setup
+# Plane schedule manager
 ![](SignalR-workflow-diagram.png)
 
 In the diagram:
