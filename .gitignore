@@ -344,3 +344,5 @@ healthchecksdb
 .vscode/tasks.json
 
 trash
+
+PlaneScheduleManager.Server/Secrets/
