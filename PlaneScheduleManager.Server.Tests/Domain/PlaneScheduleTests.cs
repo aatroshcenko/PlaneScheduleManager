@@ -138,5 +138,30 @@ namespace PlaneScheduleManager.Server.Tests.Domain
                 Times.Once);
 
         }
+
+        [Fact]
+        public void Schedule_past_plane_flight()
+        {
+            var utcNow = new DateTimeOffset(2022, 1, 1, 11, 0, 0, TimeSpan.Zero);
+            var domainEvents = new DomainEvents();
+            var timerManagerMock = new Mock<ITimerManager>();
+            var serviceProvider = CreateServiceProvider(timerManagerMock.Object);
+            var domainEventDispatcher = new DomainEventDispatcher(serviceProvider);
+            var dateTimeServerMock = new Mock<IDateTimeServer>();
+            dateTimeServerMock.Setup(x => x.UtcNow)
+                .Returns(utcNow);
+            var planeFlight = CreatePlaneFlight(utcNow.AddHours(-1), utcNow.AddMinutes(-1));
+            var sut = new PlaneScheduler(
+                domainEvents,
+                domainEventDispatcher,
+                dateTimeServerMock.Object);
+
+            sut.ScheduleFlight(planeFlight);
+
+            timerManagerMock.Verify(
+                x => x.SetTimeout(It.IsAny<Func<Task>>(), It.IsAny<double>()),
+                Times.Never);
+        }
+
     }
 }
