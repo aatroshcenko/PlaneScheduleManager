@@ -31,7 +31,8 @@ namespace PlaneScheduleManager.Server.Domain.Aggregates
                 {
                     MillisecondsUntilEvent = timeUntilDeparture.Add(FinalCallMade.TimeUntilDeparture.Negate()).TotalMilliseconds,
                     FlightIdentifier = planeFlight.FlightIdentifier,
-                    Gate = planeFlight.Gate,
+                    GateNumber = planeFlight.GateNumber,
+                    Area = planeFlight.Area
                 });
             }
 
@@ -41,7 +42,8 @@ namespace PlaneScheduleManager.Server.Domain.Aggregates
                 {
                     MillisecondsUntilEvent = timeUntilDeparture.Add(GateOpened.TimeUntilDeparture.Negate()).TotalMilliseconds,
                     FlightIdentifier = planeFlight.FlightIdentifier,
-                    Gate = planeFlight.Gate,
+                    GateNumber = planeFlight.GateNumber,
+                    Area = planeFlight.Area
                 });
             }
 

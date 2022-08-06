@@ -34,7 +34,6 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
-builder.Services.AddSingleton<IClientFactory, ClientFactory>();
 builder.Services.AddSingleton<IDateTimeServer, DateTimeServer>();
 builder.Services.AddSingleton<PlaneScheduler>();
 builder.Services.AddSingleton<DomainEvents>();

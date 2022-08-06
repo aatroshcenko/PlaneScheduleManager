@@ -20,5 +20,13 @@ namespace PlaneScheduleManager.Server.Services
                 .SendAsync("RecieveAudioMessage",
                 audioBase64);
         }
+
+        public async Task SendAudioToAllInArea(string audioBase64, string area)
+        {
+            string areaGroupName = Device.GetAreaGroupName(area);
+            await _hubContext.Clients.Groups(areaGroupName)
+                .SendAsync("RecieveAudioMessage",
+                audioBase64);
+        }
     }
 }

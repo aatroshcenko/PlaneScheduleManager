@@ -19,7 +19,8 @@ namespace PlaneScheduleManager.Server.Mappers
             Map(m => m.FlightIdentifier).Convert(x => $"{x.Row.GetField("UniqueCarrier")}-{x.Row.GetField("FlightNum")}");
             Map(m => m.Departure).Name("Dep");
             Map(m => m.Destanation).Name("Dest");
-            Map(m => m.Gate);
+            Map(m => m.Area);
+            Map(m => m.GateNumber).Name("GateNum");
         }
     }
 }

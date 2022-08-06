@@ -11,16 +11,13 @@ namespace PlaneScheduleManager.Server.Hubs
     {
         private readonly ILogger<DevicesHub> _logger;
         private readonly IMemoryCache _memoryCache;
-        private readonly IClientFactory _clientFactory;
         private readonly IDateTimeServer _dateTimeServer;
         public DevicesHub(
             IMemoryCache memoryCache,
-            IClientFactory clientFactory,
             IDateTimeServer dateTimeServer,
             ILogger<DevicesHub> logger)
         {
             _dateTimeServer = dateTimeServer;
-            _clientFactory = clientFactory;
             _memoryCache = memoryCache;
             _logger = logger;
         }
@@ -50,16 +47,19 @@ namespace PlaneScheduleManager.Server.Hubs
             }
 
             var identifier = httpContext.Request.Query["identifier"];
-            IClient client = _clientFactory.Create(identifier, isManager);
-            _memoryCache.Set<IClient>(Context.ConnectionId, client);
 
             if (isManager)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, Manager.GroupName);
+                _memoryCache.Set<IClient>(Context.ConnectionId, new Manager(identifier));
+                await Groups.AddToGroupAsync(Context.ConnectionId, Manager.GroupName);               
             }
             else
             {
+                var area = httpContext.Request.Query["area"];
+                var device = new Device(identifier, area);
+                _memoryCache.Set<IClient>(Context.ConnectionId, device);
                 await Groups.AddToGroupAsync(Context.ConnectionId, Device.GroupName);
+                await Groups.AddToGroupAsync(Context.ConnectionId, device.AreaGroupName);
                 await Clients.Groups(Manager.GroupName)
                     .SendAsync("ReceiveDeviceHeartbeat", new DeviceHeartbeat()
                     {
@@ -83,7 +83,6 @@ namespace PlaneScheduleManager.Server.Hubs
                         TimeStamp = _dateTimeServer.UtcNowTimeStamp,
                         Status = DeviceStatus.Disconnected
                     });
-                _memoryCache.Remove(Context.ConnectionId);
             }
             _logger.LogInformation($"Client with connectionId '{Context.ConnectionId}' was disconnected.");
         }
