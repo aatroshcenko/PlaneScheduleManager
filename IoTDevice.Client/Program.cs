@@ -3,10 +3,13 @@ using Microsoft.AspNetCore.SignalR.Client;
 using NetCoreAudio;
 using NetCoreAudio.Interfaces;
 
+Console.WriteLine("Write the area name");
+var area = Console.ReadLine();
+
 var player = new Player();
 var identifier = Guid.NewGuid();
 var connection = new HubConnectionBuilder()
-        .WithUrl($"https://localhost:7157/devicesHub?isManager=false&identifier={identifier}")
+        .WithUrl($"https://localhost:7157/devicesHub?isManager=false&identifier={identifier}&area={area}")
         .Build();
 
 connection.On<string>("RecieveAudioMessage", async (audio) => await HandleAudioMessage(player, audio));
