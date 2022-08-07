@@ -1,50 +1,28 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using IoTDevice.Client.Domain;
+using IoTDevice.Client.Services;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NetCoreAudio;
 using NetCoreAudio.Interfaces;
 
-Console.WriteLine("Write the area name");
+Console.WriteLine("Provide the area name");
 var area = Console.ReadLine();
-
-var player = new Player();
 var identifier = Guid.NewGuid();
+var device = new Device(identifier, area);
 var connection = new HubConnectionBuilder()
         .WithUrl($"https://localhost:7157/devicesHub?isManager=false&identifier={identifier}&area={area}")
         .Build();
 
-connection.On<string>("RecieveAudioMessage", async (audio) => await HandleAudioMessage(player, audio));
-await connection.StartAsync();
+var host = Host.CreateDefaultBuilder(args)
+        .ConfigureServices(services =>
+        {
+            services.AddSingleton<Device>(device);
+            services.AddSingleton<HubConnection>(connection);
+            services.AddSingleton<IPlayer, Player>();
+            services.AddHostedService<DeviceManager>();
+        })
+        .Build();
 
-
-var cancellationTokenSource = new CancellationTokenSource();
-var cancellationToken = cancellationTokenSource.Token;
-
-var worker = Task.Run(async () =>
-{
-    var delay = TimeSpan.FromSeconds(30);
-    while (!cancellationToken.IsCancellationRequested)
-    {
-        await connection.InvokeAsync("ReceiveDeviceHeartbeat", identifier);
-        Console.WriteLine("Heartbeat was sent to PlaneScheduleManager.Server.");
-        await Task.Delay(delay);
-    }
-}, cancellationToken).ContinueWith((t) =>
-{
-    if (t.IsFaulted)
-    {
-        Console.WriteLine("Something went wrong.");
-        Console.WriteLine(t.Exception.Message);
-    }
-});
-
-Console.WriteLine("Enter any key to stop.");
-Console.ReadLine();
-cancellationTokenSource.Cancel();
-await connection.StopAsync();
-
-async Task HandleAudioMessage(IPlayer player, string audioBase64)
-{
-    string fileName = Path.GetTempPath() + Guid.NewGuid().ToString() + ".mp3";
-    await File.WriteAllBytesAsync(fileName, Convert.FromBase64String(audioBase64));
-    await player.Play(fileName);
-}
+await host.RunAsync();
