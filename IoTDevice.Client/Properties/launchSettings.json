@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IoTDevice.Client": {
+      "commandName": "Project",
+      "commandLineArgs": "--Area \"A\"  --Identifier \"123456\""
+    }
+  }
+}

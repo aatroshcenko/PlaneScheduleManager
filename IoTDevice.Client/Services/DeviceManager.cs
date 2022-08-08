@@ -1,43 +1,38 @@
-﻿using IoTDevice.Client.Domain;
+﻿using IoTDevice.Client.Services.Interfaces;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NetCoreAudio.Interfaces;
 
 namespace IoTDevice.Client.Services
 {
     public class DeviceManager : IHostedService, IDisposable
     {
         private readonly HubConnection _hubConnection;
-        private readonly Device _device;
-        private readonly IPlayer _player;
+        private readonly IAudioManager _audioManager;
         private readonly ILogger<DeviceManager> _logger;
         private Timer _timer;
 
         private async Task SendHeartbeatAsync()
         {
-            await _hubConnection.InvokeAsync("ReceiveDeviceHeartbeat", _device.Identifier);
+            await _hubConnection.InvokeAsync("ReceiveDeviceHeartbeat");
             _logger.LogInformation("Heartbeat was sent to PlaneScheduleManager.Server.");
         }
 
         private async Task HandleAudioMessage(string audioBase64)
         {
             _logger.LogInformation("Device got an audio.");
-            string fileName = Path.GetTempPath() + Guid.NewGuid().ToString() + ".mp3";
-            await File.WriteAllBytesAsync(fileName, Convert.FromBase64String(audioBase64));
-            await _player.Play(fileName);
+            string fileName = await _audioManager.CreateTempMp3FileAsync(audioBase64);
+            await _audioManager.PlayAudioAsync(fileName);
         }
 
         public DeviceManager(
-            Device device,
             HubConnection hubConnection,
-            IPlayer player,
+            IAudioManager audioManager,
             ILogger<DeviceManager> logger)
         {
-            _device = device;
             _hubConnection = hubConnection;
-            _player = player;
             _logger = logger;
+            _audioManager = audioManager;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
