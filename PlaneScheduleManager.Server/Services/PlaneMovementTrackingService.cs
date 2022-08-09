@@ -3,38 +3,41 @@ using CsvHelper.Configuration;
 using PlaneScheduleManager.Server.Domain.Aggregates;
 using PlaneScheduleManager.Server.Mappers;
 using PlaneScheduleManager.Server.Models;
+using PlaneScheduleManager.Server.Utils.Interfaces;
 using System.Globalization;
 using System.Linq;
 
 namespace PlaneScheduleManager.Server.Services
 {
-    public class PlaneMovementTrackingService : IHostedService, IDisposable
+    public class PlaneMovementTrackingService : IHostedService
     {
         private int previousRowsCount = 0;
         private readonly ILogger<PlaneMovementTrackingService> _logger;
-        private Timer? _timer = null;
+        private readonly ITimerManager _timerManager;
         private readonly PlaneScheduler _planeScheduler;
+        private Guid _intervalId;
 
 
         public PlaneMovementTrackingService(
+            ITimerManager timerManager,
             ILogger<PlaneMovementTrackingService> logger,
             PlaneScheduler planeScheduler)
         {
             _logger = logger;
             _planeScheduler = planeScheduler;
+            _timerManager = timerManager;
         }
 
         public Task StartAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Plane movement tracking service is running.");
 
-            _timer = new Timer(TrackChanges, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
-
+            _intervalId = _timerManager.SetInterval(TrackChanges, TimeSpan.FromMinutes(1).TotalMilliseconds);
 
             return Task.CompletedTask;
         }
 
-        private void TrackChanges(object? state)
+        private void TrackChanges()
         {
             const string filePath = @"./Datasets/AirlineDataset/Flights/Flights.csv";
             if (!File.Exists(filePath))
@@ -72,14 +75,9 @@ namespace PlaneScheduleManager.Server.Services
         {
             _logger.LogInformation("Plane movement tracking service is stopping.");
 
-            _timer?.Change(Timeout.Infinite, 0);
+            _timerManager.ClearInterval(_intervalId);
 
             return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            _timer?.Dispose();
         }
     }
 }

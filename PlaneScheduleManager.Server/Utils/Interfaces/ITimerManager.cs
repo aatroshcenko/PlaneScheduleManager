@@ -2,6 +2,9 @@
 {
     public interface ITimerManager
     {
-        public void SetTimeout(Func<Task> asyncAction, double timeoutMilliseconds);
+        Guid SetTimeout(Func<Task> asyncFunc, double timeoutMilliseconds);
+        Guid SetInterval(Action action, double intervalMilliseconds);
+
+        void ClearInterval(Guid timerId);
     }
 }
