@@ -10,16 +10,19 @@ namespace PlaneScheduleManager.Server.Domain.Aggregates
 
         public string Area { get; }
 
+        public int Gate { get; }
+
 
         public static string GetAreaGroupName(string area)
         {
             return $"{GroupName}_Area_{area}";
         }
 
-        public Device(string identifier, string area)
+        public Device(string identifier, string area, int gate)
         {
             Identifier = identifier;
             Area = area;
+            Gate = gate;
         }
 
         public bool IsManager()

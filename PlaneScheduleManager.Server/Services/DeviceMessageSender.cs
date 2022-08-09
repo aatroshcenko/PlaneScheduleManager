@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using PlaneScheduleManager.Server.Domain.Aggregates;
 using PlaneScheduleManager.Server.Hubs;
+using PlaneScheduleManager.Server.Models;
 using PlaneScheduleManager.Server.Services.Interfaces;
 
 namespace PlaneScheduleManager.Server.Services
@@ -14,19 +15,26 @@ namespace PlaneScheduleManager.Server.Services
             _hubContext = hubContext;
         }
 
-        public async Task SendAudioToAll(string audioBase64)
+        public async Task SendAudioToAllAsync(string audioBase64)
         {
            await _hubContext.Clients.Groups(Device.GroupName)
-                .SendAsync("RecieveAudioMessage",
-                audioBase64);
+                .SendAsync("ReceiveAudioMessage",
+                new AudioMessage()
+                {
+                    AudioBase64 = audioBase64
+                });
         }
 
-        public async Task SendAudioToAllInArea(string audioBase64, string area)
+        public async Task SendAudioToAllInAreaAsync(string audioBase64, string area, int gateNumber)
         {
             string areaGroupName = Device.GetAreaGroupName(area);
             await _hubContext.Clients.Groups(areaGroupName)
-                .SendAsync("RecieveAudioMessage",
-                audioBase64);
+                .SendAsync("ReceiveAudioMessage",
+                new AudioMessage()
+                {
+                    AudioBase64 = audioBase64,
+                    Gate = gateNumber
+                });
         }
     }
 }

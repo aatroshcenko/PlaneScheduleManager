@@ -22,17 +22,34 @@ namespace PlaneScheduleManager.Server.Hubs
             _logger = logger;
         }
 
-        public async Task ReceiveDeviceHeartbeat(string identifier)
+        public async Task ReceiveDeviceHeartbeat()
         {
+            var client = _memoryCache.Get<IClient>(Context.ConnectionId);
             await Clients.Groups(Manager.GroupName).SendAsync(
                 "ReceiveDeviceHeartbeat",
                 new DeviceHeartbeat()
                 {
-                    DeviceId = identifier,
+                    DeviceId = client.Identifier,
                     TimeStamp = _dateTimeServer.UtcNowTimeStamp,
                     Status = DeviceStatus.Connected
                 });
         } 
+
+        public async Task BroadcastClusterLock()
+        {
+            var client = _memoryCache.Get<Device>(Context.ConnectionId);
+            await Clients.Group(client.AreaGroupName).SendAsync(
+                "ReceiveClusterLock");
+
+        }
+
+        public async Task BroadcastClusterRelease()
+        {
+            var client = _memoryCache.Get<Device>(Context.ConnectionId);
+            await Clients.Group(client.AreaGroupName).SendAsync(
+                "ReceiveClusterRelease");
+
+        }
 
         public override async Task OnConnectedAsync()
         {
@@ -56,10 +73,11 @@ namespace PlaneScheduleManager.Server.Hubs
             else
             {
                 var area = httpContext.Request.Query["area"];
-                var device = new Device(identifier, area);
+                var gate =int.Parse(httpContext.Request.Query["gate"]);
+                var device = new Device(identifier, area, gate);
                 _memoryCache.Set<IClient>(Context.ConnectionId, device);
                 await Groups.AddToGroupAsync(Context.ConnectionId, Device.GroupName);
-                await Groups.AddToGroupAsync(Context.ConnectionId, device.AreaGroupName);
+                
                 await Clients.Groups(Manager.GroupName)
                     .SendAsync("ReceiveDeviceHeartbeat", new DeviceHeartbeat()
                     {
@@ -67,6 +85,8 @@ namespace PlaneScheduleManager.Server.Hubs
                         TimeStamp = _dateTimeServer.UtcNowTimeStamp,
                         Status = DeviceStatus.Connected
                     });
+                await Clients.Groups(device.AreaGroupName).SendAsync("ReceiveConnectedDevice", device.Gate);
+                await Groups.AddToGroupAsync(Context.ConnectionId, device.AreaGroupName);
             }
         }
 
@@ -76,6 +96,7 @@ namespace PlaneScheduleManager.Server.Hubs
             var client = _memoryCache.Get<IClient>(Context.ConnectionId);
             if(client != null && !client.IsManager())
             {
+                var device = (Device)client;
                 await Clients.Groups(Manager.GroupName)
                     .SendAsync("ReceiveDeviceHeartbeat", new DeviceHeartbeat()
                     {
@@ -83,6 +104,9 @@ namespace PlaneScheduleManager.Server.Hubs
                         TimeStamp = _dateTimeServer.UtcNowTimeStamp,
                         Status = DeviceStatus.Disconnected
                     });
+                await Clients.Groups(device.AreaGroupName)
+                    .SendAsync("ReceiveDisconnectedDevice", device.Gate);
+
             }
             _logger.LogInformation($"Client with connectionId '{Context.ConnectionId}' was disconnected.");
         }

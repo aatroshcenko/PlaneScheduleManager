@@ -23,10 +23,16 @@ namespace IoTDevice.Client.Services
             _logger.LogInformation("Heartbeat was sent to PlaneScheduleManager.");
         }
 
-        public async Task SendAudioPlayerStatusAsync(AudioPlayerStatus status)
+        public async Task BroadcastClusterLockAsync()
         {
-            await _hubConnection.InvokeAsync("BroadcastAudioPlayerStatus", status);
-            _logger.LogInformation("Player status '{status}' was sent to PlaneScheduleManager.", status.ToString());
+            await _hubConnection.InvokeAsync("BroadcastClusterLock");
+            _logger.LogInformation("Cluster lock was broadcasted.");
+        }
+
+        public async Task BroadcastClusterReleaseAsync()
+        {
+            await _hubConnection.InvokeAsync("BroadcastClusterRelease");
+            _logger.LogInformation("Cluster release was broadcasted.");
         }
     }
 }

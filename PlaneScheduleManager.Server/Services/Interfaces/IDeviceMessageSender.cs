@@ -2,8 +2,8 @@
 {
     public interface IDeviceMessageSender
     {
-        Task SendAudioToAll(string audioBase64);
+        Task SendAudioToAllAsync(string audioBase64);
 
-        Task SendAudioToAllInArea(string audioBase64, string area);
+        Task SendAudioToAllInAreaAsync(string audioBase64, string area, int gateNumber);
     }
 }

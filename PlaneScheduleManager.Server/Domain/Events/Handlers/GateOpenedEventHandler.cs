@@ -26,7 +26,7 @@ namespace PlaneScheduleManager.Server.Domain.Events.Handlers
             _timerManager.SetTimeout(async () =>
             {
                 ByteString audio = await _audioGenerator.SynthesizeSpeechAsync(@event.ToString());
-                await _deviceMessageSender.SendAudioToAllInArea(audio.ToBase64(), @event.Area);
+                await _deviceMessageSender.SendAudioToAllInAreaAsync(audio.ToBase64(), @event.Area, @event.GateNumber);
             },
             @event.MillisecondsUntilEvent);
         }

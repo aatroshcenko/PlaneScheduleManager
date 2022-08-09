@@ -1,11 +1,9 @@
-﻿using IoTDevice.Client.Models;
-
-namespace IoTDevice.Client.Services.Interfaces
+﻿namespace IoTDevice.Client.Services.Interfaces
 {
     public interface IHubMessageSender
     {
         Task SendHeartbeatAsync();
-
-        Task SendAudioPlayerStatusAsync(AudioPlayerStatus status);
+        Task BroadcastClusterLockAsync();
+        Task BroadcastClusterReleaseAsync();
     }
 }
