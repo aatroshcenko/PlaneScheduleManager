@@ -15,6 +15,7 @@ namespace PlaneScheduleManager.Server.Tests.Domain
 {
     public class PlaneScheduleTests
     {
+        private readonly DateTimeOffset UtcNow = new DateTimeOffset(2022, 1, 1, 11, 0, 0, TimeSpan.Zero);
         private IServiceProvider CreateServiceProvider(ITimerManager timerManager)
         {            
             var audioGeneratorMock = new Mock<IAudioGenerator>();
@@ -47,22 +48,26 @@ namespace PlaneScheduleManager.Server.Tests.Domain
             };
         }
 
-        [Fact]
-        public void Schedule_future_plane_arrival()
+        private PlaneScheduler CreatePlaneScheduler(DateTimeOffset utcNow, ITimerManager timerManager)
         {
-            var utcNow = new DateTimeOffset(2022, 1, 1, 11, 0, 0, TimeSpan.Zero);
             var domainEvents = new DomainEvents();
-            var timerManagerMock = new Mock<ITimerManager>();
-            var serviceProvider = CreateServiceProvider(timerManagerMock.Object);
+            var serviceProvider = CreateServiceProvider(timerManager);
             var domainEventDispatcher = new DomainEventDispatcher(serviceProvider);
             var dateTimeServerMock = new Mock<IDateTimeServer>();
             dateTimeServerMock.Setup(x => x.UtcNow)
                 .Returns(utcNow);
-            var planeFlight = CreatePlaneFlight(utcNow.AddHours(-1), utcNow);
-            var sut = new PlaneScheduler(
+            return new PlaneScheduler(
                 domainEvents,
                 domainEventDispatcher,
                 dateTimeServerMock.Object);
+        }
+
+        [Fact]
+        public void Schedule_future_plane_arrival()
+        {
+            var timerManagerMock = new Mock<ITimerManager>();
+            var sut = CreatePlaneScheduler(UtcNow, timerManagerMock.Object);
+            var planeFlight = CreatePlaneFlight(UtcNow.AddHours(-1), UtcNow);
 
             sut.ScheduleFlight(planeFlight);
 
@@ -74,21 +79,11 @@ namespace PlaneScheduleManager.Server.Tests.Domain
         [Fact]
         public void Schedule_future_final_call()
         {
-            var utcNow = new DateTimeOffset(2022, 1, 1, 11, 0, 0, TimeSpan.Zero);
-            var domainEvents = new DomainEvents();
             var timerManagerMock = new Mock<ITimerManager>();
-            var serviceProvider = CreateServiceProvider(timerManagerMock.Object);
-            var domainEventDispatcher = new DomainEventDispatcher(serviceProvider);
-            var dateTimeServerMock = new Mock<IDateTimeServer>();
-            dateTimeServerMock.Setup(x => x.UtcNow)
-                .Returns(utcNow);
+            var sut = CreatePlaneScheduler(UtcNow, timerManagerMock.Object);
             var planeFlight = CreatePlaneFlight(
-                utcNow.Add(FinalCallMade.TimeUntilDeparture),
-                utcNow.Add(FinalCallMade.TimeUntilDeparture).AddHours(1));
-            var sut = new PlaneScheduler(
-                domainEvents,
-                domainEventDispatcher,
-                dateTimeServerMock.Object);
+                UtcNow.Add(FinalCallMade.TimeUntilDeparture),
+                UtcNow.Add(FinalCallMade.TimeUntilDeparture).AddHours(1));
 
             sut.ScheduleFlight(planeFlight);
 
@@ -105,21 +100,11 @@ namespace PlaneScheduleManager.Server.Tests.Domain
         [Fact]
         public void Schedule_future_gate_opening()
         {
-            var utcNow = new DateTimeOffset(2022, 1, 1, 11, 0, 0, TimeSpan.Zero);
-            var domainEvents = new DomainEvents();
             var timerManagerMock = new Mock<ITimerManager>();
-            var serviceProvider = CreateServiceProvider(timerManagerMock.Object);
-            var domainEventDispatcher = new DomainEventDispatcher(serviceProvider);
-            var dateTimeServerMock = new Mock<IDateTimeServer>();
-            dateTimeServerMock.Setup(x => x.UtcNow)
-                .Returns(utcNow);
+            var sut = CreatePlaneScheduler(UtcNow, timerManagerMock.Object);
             var planeFlight = CreatePlaneFlight(
-                utcNow.Add(GateOpened.TimeUntilDeparture),
-                utcNow.Add(GateOpened.TimeUntilDeparture).AddHours(1));
-            var sut = new PlaneScheduler(
-                domainEvents,
-                domainEventDispatcher,
-                dateTimeServerMock.Object);
+                UtcNow.Add(GateOpened.TimeUntilDeparture),
+                UtcNow.Add(GateOpened.TimeUntilDeparture).AddHours(1));
 
             sut.ScheduleFlight(planeFlight);
 
@@ -140,21 +125,11 @@ namespace PlaneScheduleManager.Server.Tests.Domain
         }
 
         [Fact]
-        public void Schedule_past_plane_flight()
+        public void Schedule_no_events_for_past_plane_flight()
         {
-            var utcNow = new DateTimeOffset(2022, 1, 1, 11, 0, 0, TimeSpan.Zero);
-            var domainEvents = new DomainEvents();
             var timerManagerMock = new Mock<ITimerManager>();
-            var serviceProvider = CreateServiceProvider(timerManagerMock.Object);
-            var domainEventDispatcher = new DomainEventDispatcher(serviceProvider);
-            var dateTimeServerMock = new Mock<IDateTimeServer>();
-            dateTimeServerMock.Setup(x => x.UtcNow)
-                .Returns(utcNow);
-            var planeFlight = CreatePlaneFlight(utcNow.AddHours(-1), utcNow.AddMinutes(-1));
-            var sut = new PlaneScheduler(
-                domainEvents,
-                domainEventDispatcher,
-                dateTimeServerMock.Object);
+            var sut = CreatePlaneScheduler(UtcNow, timerManagerMock.Object);
+            var planeFlight = CreatePlaneFlight(UtcNow.AddHours(-1), UtcNow.AddMinutes(-1));
 
             sut.ScheduleFlight(planeFlight);
 
