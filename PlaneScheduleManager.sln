@@ -14,6 +14,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlaneScheduleManager.Server
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "plane-schedule-manager-client", "plane-schedule-manager-client\plane-schedule-manager-client.esproj", "{61A80D81-1C5A-4684-B445-7F0DE162FA5F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoTDevice.Client.Tests", "IoTDevice.Client.Tests\IoTDevice.Client.Tests.csproj", "{6043EC55-BDC6-40B7-A9FC-424F72C329B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{61A80D81-1C5A-4684-B445-7F0DE162FA5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61A80D81-1C5A-4684-B445-7F0DE162FA5F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{61A80D81-1C5A-4684-B445-7F0DE162FA5F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{6043EC55-BDC6-40B7-A9FC-424F72C329B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6043EC55-BDC6-40B7-A9FC-424F72C329B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6043EC55-BDC6-40B7-A9FC-424F72C329B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6043EC55-BDC6-40B7-A9FC-424F72C329B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
