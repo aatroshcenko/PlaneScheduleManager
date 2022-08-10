@@ -1,5 +1,4 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using IoTDevice.Client.Domain;
 using IoTDevice.Client.Services;
 using IoTDevice.Client.Services.Interfaces;
 using IoTDevice.Client.Utils;
@@ -15,21 +14,15 @@ using NetCoreAudio.Interfaces;
 var host = Host.CreateDefaultBuilder(args)
         .ConfigureServices(services =>
         {
-            services.AddSingleton<Device>((provider) =>
-            {
-                var configuration = provider.GetService<IConfiguration>();
-                var identifier = configuration["Identifier"];
-                var area = configuration["Area"];
-                var gate = int.Parse(configuration["Gate"]);
-                return new Device(identifier, area, gate);
-            });
             services.AddSingleton<HubConnection>((provider) =>
             {
                 var configuration = provider.GetService<IConfiguration>();
-                var device = provider.GetService<Device>();
                 var hubUrl = configuration["Urls:Hub"];
+                var clientId = configuration["ClientId"];
+                var area = configuration["Area"];
+                var gate = int.Parse(configuration["Gate"]);
                 return new HubConnectionBuilder()
-                    .WithUrl($"{hubUrl}?isManager=false&identifier={device.Identifier}&area={device.Area}&gate={device.Gate}")
+                    .WithUrl($"{hubUrl}?isManager=false&clientId={clientId}&area={area}&gate={gate}")
                     .Build();
             });
             services.AddSingleton<IPlayer, Player>();

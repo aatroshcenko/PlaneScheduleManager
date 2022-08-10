@@ -1,4 +1,5 @@
 ﻿using PlaneScheduleManager.Server.Domain.Events;
+using PlaneScheduleManager.Server.Domain.ValueObjects;
 using PlaneScheduleManager.Server.Models;
 using PlaneScheduleManager.Server.Utils.Interfaces;
 
@@ -27,35 +28,30 @@ namespace PlaneScheduleManager.Server.Domain.Aggregates
             var timeUntilArrival = planeFlight.ArrivalTime - utcNow;
             if (timeUntilDeparture >= FinalCallMade.TimeUntilDeparture)
             {
-                _domainEvents.Raise(new FinalCallMade()
-                {
-                    MillisecondsUntilEvent = timeUntilDeparture.Add(FinalCallMade.TimeUntilDeparture.Negate()).TotalMilliseconds,
-                    FlightIdentifier = planeFlight.FlightIdentifier,
-                    GateNumber = planeFlight.GateNumber,
-                    Area = planeFlight.Area
-                });
+                _domainEvents.Raise(new FinalCallMade(
+                    flightId: new FlightId(planeFlight.FlightIdentifier),
+                    gate: new Gate(planeFlight.GateNumber, new Area(planeFlight.Area)),
+                    timeUntilEvent: timeUntilDeparture.Add(FinalCallMade.TimeUntilDeparture.Negate()))
+                );
             }
 
             if(timeUntilDeparture >= GateOpened.TimeUntilDeparture)
             {
-                _domainEvents.Raise(new GateOpened()
-                {
-                    MillisecondsUntilEvent = timeUntilDeparture.Add(GateOpened.TimeUntilDeparture.Negate()).TotalMilliseconds,
-                    FlightIdentifier = planeFlight.FlightIdentifier,
-                    GateNumber = planeFlight.GateNumber,
-                    Area = planeFlight.Area
-                });
+                _domainEvents.Raise(new GateOpened(
+                    flightId: new FlightId(planeFlight.FlightIdentifier),
+                    gate: new Gate(planeFlight.GateNumber, new Area(planeFlight.Area)),
+                    timeUntilEvent: timeUntilDeparture.Add(GateOpened.TimeUntilDeparture.Negate()))
+                );
             }
 
             if(timeUntilArrival >= TimeSpan.Zero)
             {
-                _domainEvents.Raise(new PlaneArrived()
-                {
-                    MillisecondsUntilEvent = timeUntilArrival.TotalMilliseconds,
-                    FlightIdentifier = planeFlight.FlightIdentifier,
-                    Departure = planeFlight.Departure,
-                    Destanation = planeFlight.Destanation
-                });;
+                _domainEvents.Raise(new PlaneArrived(
+                    flightId: new FlightId(planeFlight.FlightIdentifier),
+                    departure: new AirportCode(planeFlight.Departure),
+                    destanation: new AirportCode(planeFlight.Destanation),
+                    timeUntilEvent: timeUntilArrival
+                ));;
             }
         }
     }

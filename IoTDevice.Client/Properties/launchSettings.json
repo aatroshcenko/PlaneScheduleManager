@@ -2,7 +2,7 @@
   "profiles": {
     "IoTDevice.Client": {
       "commandName": "Project",
-      "commandLineArgs": "--Identifier \"123456\" --Area \"A\" --Gate 1"
+      "commandLineArgs": "--ClientId \"123456\" --Area \"A\" --Gate 1"
     }
   }
 }

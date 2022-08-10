@@ -1,5 +1,4 @@
-﻿using IoTDevice.Client.Models;
-using IoTDevice.Client.Services.Interfaces;
+﻿using IoTDevice.Client.Services.Interfaces;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -33,16 +32,12 @@ namespace IoTDevice.Client.Services
 
             var heartbeatDelay = TimeSpan.FromSeconds(30);
 
-            _hubConnection.On<AudioMessage>("ReceiveAudioMessage", 
-                async (message) => await _devicesClusterManager.HandleAudioMessageAsync(message));
+            _hubConnection.On<string>("ReceiveAudioMessage", 
+                async (audio) => await _devicesClusterManager.HandleAudioMessageAsync(audio));
             _hubConnection.On("ReceiveClusterLock",
                 () => _devicesClusterManager.Lock());
             _hubConnection.On("ReceiveClusterRelease",
                 () => _devicesClusterManager.Release());
-            _hubConnection.On<int>("ReceiveDisconnectedDevice",
-                (gateNumber) => _devicesClusterManager.HandleDeviceDisconnection(gateNumber));
-            _hubConnection.On<int>("ReceiveConnectedDevice",
-                (gateNumber) => _devicesClusterManager.HandleDeviceConnection(gateNumber));
             _timer = new Timer(async (state) => await _deviceManager.SendHeartbeatAsync(), null, TimeSpan.Zero, heartbeatDelay);
         }
         public async Task StopAsync(CancellationToken cancellationToken)

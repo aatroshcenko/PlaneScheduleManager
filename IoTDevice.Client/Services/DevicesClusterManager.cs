@@ -1,6 +1,4 @@
-﻿using IoTDevice.Client.Domain;
-using IoTDevice.Client.Models;
-using IoTDevice.Client.Services.Interfaces;
+﻿using IoTDevice.Client.Services.Interfaces;
 using IoTDevice.Client.Utils.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -10,7 +8,6 @@ namespace IoTDevice.Client.Services
     {
         private static readonly TimeSpan TimeoutPeriod = TimeSpan.FromMinutes(3);
         private static readonly TimeSpan DelayInterval = TimeSpan.FromSeconds(1);
-        private readonly Device _device;
         private readonly IDeviceManager _deviceManager;
         private readonly IHubMessageSender _hubMessageSender;
         private readonly IDateTimeServer _dateTimeServer;
@@ -18,28 +15,21 @@ namespace IoTDevice.Client.Services
         private volatile bool _isLocked = false;
         
         public DevicesClusterManager(
-            Device device,
             IDeviceManager deviceManager,
             IHubMessageSender hubMessageSender,
             IDateTimeServer dateTimeServer,
             ILogger<DevicesClusterManager> logger)
         {
-            _device = device;
             _deviceManager = deviceManager;
             _hubMessageSender = hubMessageSender;
             _dateTimeServer = dateTimeServer;
             _logger = logger;
         }
 
-        public async Task HandleAudioMessageAsync(AudioMessage message)
+        public async Task HandleAudioMessageAsync(string audioBase64)
         {
-            _logger.LogInformation($"Device {_device.Identifier} received an audio.");
-            if (message.Gate.HasValue &&
-                _device.Gate != message.Gate && 
-                !_device.AdditionalGates.Contains(message.Gate.Value))
-            {
-                return;
-            }
+            _logger.LogInformation($"Device received an audio.");
+
             var recievTime = _dateTimeServer.UtcNow;
 
             while (_isLocked)
@@ -54,20 +44,9 @@ namespace IoTDevice.Client.Services
             }
 
             await _hubMessageSender.BroadcastClusterLockAsync();
-            await _deviceManager.HandleAudioMessageAsync(message.AudioBase64);
+            await _deviceManager.HandleAudioMessageAsync(audioBase64);
             await _hubMessageSender.BroadcastClusterReleaseAsync();
         }
-
-        public void HandleDeviceConnection(int gateNumber)
-        {
-            _device.RemoveGate(gateNumber);
-        }
-
-        public void HandleDeviceDisconnection(int gateNumber)
-        {
-            _device.AddGate(gateNumber);
-        }
-
         public void Lock()
         {
             _isLocked = true;

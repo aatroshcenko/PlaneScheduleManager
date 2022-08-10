@@ -5,6 +5,7 @@ using PlaneScheduleManager.Server.Domain.Events;
 using PlaneScheduleManager.Server.Domain.Events.Handlers;
 using PlaneScheduleManager.Server.Domain.Events.Interfaces;
 using PlaneScheduleManager.Server.Models;
+using PlaneScheduleManager.Server.Services;
 using PlaneScheduleManager.Server.Services.Interfaces;
 using PlaneScheduleManager.Server.Utils.Interfaces;
 using System;
@@ -17,11 +18,13 @@ namespace PlaneScheduleManager.Server.Tests.Domain
     {
         private readonly DateTimeOffset UtcNow = new DateTimeOffset(2022, 1, 1, 11, 0, 0, TimeSpan.Zero);
         private IServiceProvider CreateServiceProvider(ITimerManager timerManager)
-        {            
+        {
+            var devicesManager = new DevicesManager();
             var audioGeneratorMock = new Mock<IAudioGenerator>();
             var deviceMessageSenderMock = new Mock<IDeviceMessageSender>();
             var serviceCollection = new ServiceCollection();
 
+            serviceCollection.AddSingleton<IDevicesManager>(devicesManager);
             serviceCollection.AddSingleton(timerManager);
             serviceCollection.AddSingleton(audioGeneratorMock.Object);
             serviceCollection.AddSingleton(deviceMessageSenderMock.Object);

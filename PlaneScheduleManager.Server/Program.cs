@@ -1,15 +1,14 @@
 
+using Google.Cloud.TextToSpeech.V1;
 using PlaneScheduleManager.Server.Domain.Aggregates;
-using PlaneScheduleManager.Server.Domain.Aggregates.Interfaces;
-using PlaneScheduleManager.Server.Domain.Events.Handlers;
 using PlaneScheduleManager.Server.Domain.Events;
+using PlaneScheduleManager.Server.Domain.Events.Handlers;
 using PlaneScheduleManager.Server.Domain.Events.Interfaces;
 using PlaneScheduleManager.Server.Hubs;
 using PlaneScheduleManager.Server.Services;
+using PlaneScheduleManager.Server.Services.Interfaces;
 using PlaneScheduleManager.Server.Utils;
 using PlaneScheduleManager.Server.Utils.Interfaces;
-using Google.Cloud.TextToSpeech.V1;
-using PlaneScheduleManager.Server.Services.Interfaces;
 
 var corsPolicyName = "AllowSpecificOrigin";
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +21,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
-builder.Services.AddMemoryCache();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(corsPolicyName, policy =>
@@ -38,6 +36,7 @@ builder.Services.AddSingleton<IDateTimeServer, DateTimeServer>();
 builder.Services.AddSingleton<PlaneScheduler>();
 builder.Services.AddSingleton<DomainEvents>();
 builder.Services.AddSingleton<DomainEventDispatcher>();
+builder.Services.AddSingleton<IDevicesManager, DevicesManager>();
 builder.Services.AddSingleton<IDomainEventHandler<PlaneArrived>, PlaneArrivedEventHandler>();
 builder.Services.AddSingleton<IDomainEventHandler<GateOpened>, GateOpenedEventHandler>();
 builder.Services.AddSingleton<IDomainEventHandler<FinalCallMade>, FinalCallEventHandler>();

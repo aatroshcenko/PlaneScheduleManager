@@ -1,16 +1,9 @@
-﻿using IoTDevice.Client.Models;
-
-namespace IoTDevice.Client.Services.Interfaces
+﻿namespace IoTDevice.Client.Services.Interfaces
 {
     public interface IDevicesClusterManager
     {
-        Task HandleAudioMessageAsync(AudioMessage message);
-
-        void HandleDeviceDisconnection(int gateNumber);
-
-        void HandleDeviceConnection(int gateNumber);
+        Task HandleAudioMessageAsync(string audioBase64);
         void Lock();
-
         void Release();
     }
 }

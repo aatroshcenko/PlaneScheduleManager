@@ -1,6 +1,4 @@
-﻿using IoTDevice.Client.Domain;
-using IoTDevice.Client.Models;
-using IoTDevice.Client.Services.Interfaces;
+﻿using IoTDevice.Client.Services.Interfaces;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 

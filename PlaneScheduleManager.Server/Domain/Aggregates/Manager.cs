@@ -1,19 +1,14 @@
-﻿using PlaneScheduleManager.Server.Domain.Aggregates.Interfaces;
+﻿using PlaneScheduleManager.Server.Domain.ValueObjects;
 
 namespace PlaneScheduleManager.Server.Domain.Aggregates
 {
-    public class Manager : IClient
+    public class Manager
     {
         public static readonly string GroupName = "Manager";
-        public string Identifier { get; }
-        public bool IsManager()
+        public ClientId Id { get; }
+        public Manager(ClientId id)
         {
-            return true;
-        }
-
-        public Manager(string identifier)
-        {
-            Identifier = identifier;
+            Id = id;
         }
     }
 }

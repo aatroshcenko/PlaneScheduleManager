@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Caching.Memory;
-using PlaneScheduleManager.Server.Models;
-using PlaneScheduleManager.Server.Domain.Aggregates.Interfaces;
 using PlaneScheduleManager.Server.Domain.Aggregates;
+using PlaneScheduleManager.Server.Domain.ValueObjects;
+using PlaneScheduleManager.Server.Models;
+using PlaneScheduleManager.Server.Services.Interfaces;
 using PlaneScheduleManager.Server.Utils.Interfaces;
 
 namespace PlaneScheduleManager.Server.Hubs
@@ -10,26 +10,26 @@ namespace PlaneScheduleManager.Server.Hubs
     public class DevicesHub: Hub
     {
         private readonly ILogger<DevicesHub> _logger;
-        private readonly IMemoryCache _memoryCache;
         private readonly IDateTimeServer _dateTimeServer;
+        private readonly IDevicesManager _devicesManager;
         public DevicesHub(
-            IMemoryCache memoryCache,
             IDateTimeServer dateTimeServer,
+            IDevicesManager devicesManager,
             ILogger<DevicesHub> logger)
         {
             _dateTimeServer = dateTimeServer;
-            _memoryCache = memoryCache;
+            _devicesManager = devicesManager;
             _logger = logger;
         }
 
         public async Task ReceiveDeviceHeartbeat()
         {
-            var client = _memoryCache.Get<IClient>(Context.ConnectionId);
+            var device = _devicesManager.Get(Context.ConnectionId);
             await Clients.Groups(Manager.GroupName).SendAsync(
                 "ReceiveDeviceHeartbeat",
                 new DeviceHeartbeat()
                 {
-                    DeviceId = client.Identifier,
+                    DeviceId = device.Id.Value,
                     TimeStamp = _dateTimeServer.UtcNowTimeStamp,
                     Status = DeviceStatus.Connected
                 });
@@ -37,16 +37,18 @@ namespace PlaneScheduleManager.Server.Hubs
 
         public async Task BroadcastClusterLock()
         {
-            var client = _memoryCache.Get<Device>(Context.ConnectionId);
-            await Clients.Group(client.AreaGroupName).SendAsync(
+            var device = _devicesManager.Get(Context.ConnectionId);
+            var cluster = _devicesManager.GetCluster(device.Gate.Area);
+            await Clients.Group(cluster.GroupName).SendAsync(
                 "ReceiveClusterLock");
 
         }
 
         public async Task BroadcastClusterRelease()
         {
-            var client = _memoryCache.Get<Device>(Context.ConnectionId);
-            await Clients.Group(client.AreaGroupName).SendAsync(
+            var device = _devicesManager.Get(Context.ConnectionId);
+            var cluster = _devicesManager.GetCluster(device.Gate.Area);
+            await Clients.Group(cluster.GroupName).SendAsync(
                 "ReceiveClusterRelease");
 
         }
@@ -63,52 +65,50 @@ namespace PlaneScheduleManager.Server.Hubs
                 throw new BadHttpRequestException("'isManager' query parameter is invalid.");
             }
 
-            var identifier = httpContext.Request.Query["identifier"];
+            var clientId = httpContext.Request.Query["clientId"];
 
             if (isManager)
             {
-                _memoryCache.Set<IClient>(Context.ConnectionId, new Manager(identifier));
-                await Groups.AddToGroupAsync(Context.ConnectionId, Manager.GroupName);               
+                await Groups.AddToGroupAsync(Context.ConnectionId, Manager.GroupName);
+                return;
             }
-            else
-            {
-                var area = httpContext.Request.Query["area"];
-                var gate =int.Parse(httpContext.Request.Query["gate"]);
-                var device = new Device(identifier, area, gate);
-                _memoryCache.Set<IClient>(Context.ConnectionId, device);
-                await Groups.AddToGroupAsync(Context.ConnectionId, Device.GroupName);
-                
-                await Clients.Groups(Manager.GroupName)
-                    .SendAsync("ReceiveDeviceHeartbeat", new DeviceHeartbeat()
-                    {
-                        DeviceId = identifier,
-                        TimeStamp = _dateTimeServer.UtcNowTimeStamp,
-                        Status = DeviceStatus.Connected
-                    });
-                await Clients.Groups(device.AreaGroupName).SendAsync("ReceiveConnectedDevice", device.Gate);
-                await Groups.AddToGroupAsync(Context.ConnectionId, device.AreaGroupName);
-            }
+
+            var area = httpContext.Request.Query["area"];
+            var gate = int.Parse(httpContext.Request.Query["gate"]);
+            var device = new Device(
+                     connectionId: Context.ConnectionId,
+                     id: new ClientId(clientId),
+                     gate: new Gate(gate, new Area(area))
+                );
+            await Groups.AddToGroupAsync(Context.ConnectionId, Device.GroupName);
+            _devicesManager.Add(Context.ConnectionId, device);
+            var cluster = _devicesManager.GetCluster(device.Gate.Area);
+            await Groups.AddToGroupAsync(Context.ConnectionId, cluster.GroupName);
+            await Clients.Groups(Manager.GroupName)
+                .SendAsync("ReceiveDeviceHeartbeat", new DeviceHeartbeat()
+                {
+                    DeviceId = clientId,
+                    TimeStamp = _dateTimeServer.UtcNowTimeStamp,
+                    Status = DeviceStatus.Connected
+                });
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             await base.OnDisconnectedAsync(exception);
-            var client = _memoryCache.Get<IClient>(Context.ConnectionId);
-            if(client != null && !client.IsManager())
-            {
-                var device = (Device)client;
-                await Clients.Groups(Manager.GroupName)
-                    .SendAsync("ReceiveDeviceHeartbeat", new DeviceHeartbeat()
-                    {
-                        DeviceId = client.Identifier,
-                        TimeStamp = _dateTimeServer.UtcNowTimeStamp,
-                        Status = DeviceStatus.Disconnected
-                    });
-                await Clients.Groups(device.AreaGroupName)
-                    .SendAsync("ReceiveDisconnectedDevice", device.Gate);
-
-            }
             _logger.LogInformation($"Client with connectionId '{Context.ConnectionId}' was disconnected.");
+            if(!_devicesManager.TryRemove(Context.ConnectionId, out var device))
+            {
+                return;
+            }
+            
+            await Clients.Groups(Manager.GroupName)
+                .SendAsync("ReceiveDeviceHeartbeat", new DeviceHeartbeat()
+                {
+                    DeviceId = device.Id.Value,
+                    TimeStamp = _dateTimeServer.UtcNowTimeStamp,
+                    Status = DeviceStatus.Disconnected
+                });
         }
     }
 }

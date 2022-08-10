@@ -27,7 +27,7 @@ namespace PlaneScheduleManager.Server.Domain.Events.Handlers
                 ByteString audio = await _audioGenerator.SynthesizeSpeechAsync(@event.ToString());
                 await _deviceMessageSender.SendAudioToAllAsync(audio.ToBase64());
             },
-            @event.MillisecondsUntilEvent);
+            @event.TimeUntilEvent.TotalMilliseconds);
         }
     }
 }

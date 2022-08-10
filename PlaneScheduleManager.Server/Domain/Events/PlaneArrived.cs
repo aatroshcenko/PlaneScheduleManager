@@ -1,17 +1,30 @@
 ﻿using PlaneScheduleManager.Server.Domain.Events.Interfaces;
+using PlaneScheduleManager.Server.Domain.ValueObjects;
 
 namespace PlaneScheduleManager.Server.Domain.Events
 {
-    public record PlaneArrived: IDomainEvent
+    public class PlaneArrived: IDomainEvent
     {
-        public double MillisecondsUntilEvent { get; init; }
-        public string FlightIdentifier { get; init; }
-        public string Departure { get; init; }
-        public string Destanation { get; init; }
+        public TimeSpan TimeUntilEvent { get; }
+        public FlightId FlightId { get; }
+        public AirportCode Departure { get; }
+        public AirportCode Destanation { get; }
+
+        public PlaneArrived(
+            FlightId flightId,
+            AirportCode departure,
+            AirportCode destanation,
+            TimeSpan timeUntilEvent)
+        {
+            FlightId = flightId;
+            Departure = departure;
+            Destanation = destanation;
+            TimeUntilEvent = timeUntilEvent;
+        }
 
         public override string ToString()
         {
-            return $"The plane {FlightIdentifier} has arrived";
+            return $"The plane {FlightId} has arrived";
         }
     }
 }

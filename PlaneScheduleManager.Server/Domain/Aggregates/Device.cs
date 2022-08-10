@@ -1,33 +1,25 @@
-﻿using PlaneScheduleManager.Server.Domain.Aggregates.Interfaces;
+﻿using PlaneScheduleManager.Server.Domain.ValueObjects;
 
 namespace PlaneScheduleManager.Server.Domain.Aggregates
 {
-    public class Device : IClient
+    public class Device
     {
         public static readonly string GroupName = "Devices";
-        public string AreaGroupName { get => GetAreaGroupName(Area); }
-        public string Identifier { get; }
 
-        public string Area { get; }
+        public string ConnectionId { get; }
 
-        public int Gate { get; }
+        public ClientId Id { get; }
 
+        public Gate Gate { get; }
 
-        public static string GetAreaGroupName(string area)
+        public Device(
+            string connectionId,
+            ClientId id,
+            Gate gate)
         {
-            return $"{GroupName}_Area_{area}";
-        }
-
-        public Device(string identifier, string area, int gate)
-        {
-            Identifier = identifier;
-            Area = area;
+            ConnectionId = connectionId;
+            Id = id;
             Gate = gate;
-        }
-
-        public bool IsManager()
-        {
-            return false;
         }
     }
 }
