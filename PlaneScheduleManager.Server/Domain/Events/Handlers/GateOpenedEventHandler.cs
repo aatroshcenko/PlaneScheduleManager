@@ -28,8 +28,13 @@ namespace PlaneScheduleManager.Server.Domain.Events.Handlers
         {
             _timerManager.SetTimeout(async () =>
             {
-                ByteString audio = await _audioGenerator.SynthesizeSpeechAsync(@event.ToString());
                 var cluster = _devicesManager.GetCluster(@event.Gate.Area);
+                if(cluster == null)
+                {
+                    throw new Exception($"Cluster for area {@event.Gate.Area} was not found.");
+                }
+
+                ByteString audio = await _audioGenerator.SynthesizeSpeechAsync(@event.ToString());
                 if (cluster.IsDeviceConnected(@event.Gate))
                 {
                     await _deviceMessageSender.SendAudioToSpecificGateAsync(audio.ToBase64(), @event.Gate);

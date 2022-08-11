@@ -12,7 +12,13 @@ namespace PlaneScheduleManager.Server.Utils
 
         public Guid SetTimeout(Func<Task> asyncFunc, double timeoutMilliseconds)
         {
-            var timer = new System.Timers.Timer(timeoutMilliseconds);
+            if(timeoutMilliseconds < 0)
+            {
+                throw new ArgumentException("Timeout can not be less than 0 milliseconds.");
+            }
+            var timer = timeoutMilliseconds == 0 
+                ? new System.Timers.Timer()
+                : new System.Timers.Timer(timeoutMilliseconds);
             var timerId = Guid.NewGuid();
             _timeoutTimers.TryAdd(timerId, timer);
             timer.Elapsed += async (state, e) =>
@@ -30,7 +36,13 @@ namespace PlaneScheduleManager.Server.Utils
 
         public Guid SetInterval(Action action, double intervalMilliseconds)
         {
-            var timer = new System.Timers.Timer(intervalMilliseconds);
+            if (intervalMilliseconds < 0)
+            {
+                throw new ArgumentException("Interval can not be less than 0 milliseconds.");
+            }
+            var timer = intervalMilliseconds == 0
+                ? new System.Timers.Timer()
+                : new System.Timers.Timer(intervalMilliseconds);
             var timerId = Guid.NewGuid();
             _intervalTimers.TryAdd(timerId, timer);
             timer.Elapsed += (state, e) =>
