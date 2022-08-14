@@ -25,7 +25,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(corsPolicyName, policy =>
     {
-        policy.WithOrigins("https//localhost:4200")
+        var allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(";");
+        policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .SetIsOriginAllowed((host) => true)
@@ -59,8 +60,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
 
 app.UseCors(corsPolicyName);
 app.UseAuthorization();
