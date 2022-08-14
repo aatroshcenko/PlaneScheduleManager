@@ -17,7 +17,7 @@ var host = Host.CreateDefaultBuilder(args)
             services.AddSingleton<HubConnection>((provider) =>
             {
                 var configuration = provider.GetService<IConfiguration>();
-                var hubUrl = configuration["Urls:Hub"];
+                var hubUrl = configuration["HUB_URL"];
                 var clientId = configuration["ClientId"];
                 var area = configuration["Area"];
                 var gate = int.Parse(configuration["Gate"]);

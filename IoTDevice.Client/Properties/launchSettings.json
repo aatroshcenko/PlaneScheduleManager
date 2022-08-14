@@ -3,6 +3,9 @@
     "IoTDevice.Client": {
       "commandName": "Project",
       "commandLineArgs": "--ClientId \"123456\" --Area \"A\" --Gate 1"
+    },
+    "Docker": {
+      "commandName": "Docker"
     }
   }
 }
