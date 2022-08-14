@@ -1,6 +1,6 @@
 const PROXY_CONFIG = [
   {
-    target: "https://localhost:7157"
+    target: "https://localhost:8001"
   }
 ]
 
