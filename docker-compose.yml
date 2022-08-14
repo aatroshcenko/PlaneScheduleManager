@@ -1,0 +1,47 @@
+version: '3.4'
+
+services:
+  planeschedulemanager.server:
+    container_name: planeschedulemanager
+    image: ${DOCKER_REGISTRY-}planeschedulemanagerserver
+    environment:
+     - ASPNETCORE_URLS=https://+;http://+
+     - ASPNETCORE_HTTPS_PORT=8001
+     - ASPNETCORE_ENVIRONMENT=Development
+    build:
+      context: .
+      dockerfile: PlaneScheduleManager.Server/Dockerfile
+    ports:
+     - "8000:80"
+     - "8001:443"
+    volumes:
+     - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets:ro
+     - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/:ro
+     - .\PlaneScheduleManager.Server\Datasets:/app/Datasets:ro
+
+  iotdevice.client1:
+    image: ${DOCKER_REGISTRY-}iotdeviceclient
+    environment:
+     - HUB_URL=http://planeschedulemanager:80/
+    build:
+      context: .
+      dockerfile: IoTDevice.Client/Dockerfile
+    depends_on:
+      - planeschedulemanager.server
+    command: dotnet run --ClientId "A1" --Area "A" --Gate 1
+
+  iotdevice.client2:
+    image: ${DOCKER_REGISTRY-}iotdeviceclient
+    environment:
+     - HUB_URL=http://planeschedulemanager:80/
+    build:
+      context: .
+      dockerfile: IoTDevice.Client/Dockerfile
+    depends_on:
+      - planeschedulemanager.server
+    command: dotnet run --ClientId "A2" --Area "A" --Gate 1
+
+networks:
+  default:
+    name: plane-schedule-net
+    external: true
