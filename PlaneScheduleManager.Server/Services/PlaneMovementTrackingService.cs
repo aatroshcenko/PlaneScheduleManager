@@ -15,10 +15,12 @@ namespace PlaneScheduleManager.Server.Services
         private readonly ILogger<PlaneMovementTrackingService> _logger;
         private readonly ITimerManager _timerManager;
         private readonly PlaneScheduler _planeScheduler;
+        private readonly string _flightDatasetPath;
         private Guid _intervalId;
 
 
         public PlaneMovementTrackingService(
+            IConfiguration configuration,
             ITimerManager timerManager,
             ILogger<PlaneMovementTrackingService> logger,
             PlaneScheduler planeScheduler)
@@ -26,6 +28,7 @@ namespace PlaneScheduleManager.Server.Services
             _logger = logger;
             _planeScheduler = planeScheduler;
             _timerManager = timerManager;
+            _flightDatasetPath = configuration["DatasetPath"];
         }
 
         public Task StartAsync(CancellationToken stoppingToken)
@@ -39,14 +42,13 @@ namespace PlaneScheduleManager.Server.Services
 
         private void TrackChanges()
         {
-            const string filePath = @"./Datasets/AirlineDataset/Flights/Flights.csv";
-            if (!File.Exists(filePath))
+            if (!File.Exists(_flightDatasetPath))
             {
-                _logger.LogWarning($"Dataset file was not found at '{Path.GetFullPath(filePath)}'");
+                _logger.LogWarning($"Dataset file was not found at '{Path.GetFullPath(_flightDatasetPath)}'");
                 return;
             }
             var currentRowsCount = previousRowsCount;
-            using(FileStream fs = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using(FileStream fs = File.Open(_flightDatasetPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (StreamReader reader = new StreamReader(fs))
             using(CsvReader csvReader = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
