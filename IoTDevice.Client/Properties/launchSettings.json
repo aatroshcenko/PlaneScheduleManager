@@ -2,7 +2,10 @@
   "profiles": {
     "IoTDevice.Client": {
       "commandName": "Project",
-      "commandLineArgs": "--ClientId \"123456\" --Area \"A\" --Gate 1"
+      "commandLineArgs": "--ClientId \"123456\" --Area \"A\" --Gate 1",
+      "environmentVariables": {
+        "HUB_URL": "https://localhost:8001/devicesHub/"
+      }
     },
     "Docker": {
       "commandName": "Docker"
