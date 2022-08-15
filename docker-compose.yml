@@ -40,6 +40,18 @@ services:
     depends_on:
       - planeschedulemanager.server
     command: dotnet run --ClientId "A2" --Area "A" --Gate 1
+  
+  manager.client:
+    image: ${DOCKER_REGISTRY-}managerclient
+    environment:
+     - HUB_URL=https://localhost:8001/devicesHub/
+    ports:
+     - "4200:80"
+    build:
+      context: ./plane-schedule-manager-client
+      dockerfile: Dockerfile
+    depends_on:
+      - planeschedulemanager.server
 
 networks:
   default:

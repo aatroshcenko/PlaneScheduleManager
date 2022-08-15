@@ -4,9 +4,8 @@
 
 export const environment = {
   production: false,
-  urls: {
-    hub: `https://localhost:8001/devicesHub?isManager=true&clientId=49A670D1-296E-4010-88F1-8FF60258C2CA`
-  }
+  clientId: window['env']['clientId'] || 'manager',
+  hubUrl: window['env']['hubUrl'] || 'https://localhost:8001/devicesHub'
 };
 
 /*

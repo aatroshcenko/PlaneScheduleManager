@@ -17,7 +17,10 @@ export class SignalrService {
     private readonly zone: NgZone
   ) {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(environment.urls.hub)
+      .withUrl(`${environment.hubUrl}?isManager=true&clientId=${environment.clientId}`, {
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets
+      })
       .build();
     this.hubConnection.on('ReceiveDeviceHeartbeat', (heartbeat: DeviceHeartbeat) => {
       this.deviceHeartBeatSource.next(heartbeat);
